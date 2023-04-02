@@ -1,47 +1,49 @@
-import boto3
+from flask import Flask, request
+from flask_restful import Api, Resource
+from datetime import datetime
 import json
+import logging
+import os
+from dotenv import load_dotenv
+from security.authentication import verify_password
+from security.authorization import require_permission
+from database.queries import insert_sensor_data, get_sensor_data
+from monitoring.sensor_monitor import SensorMonitor
 
-# Connect to IoT
-iot = boto3.client('iot')
+app = Flask(__name__)
+api = Api(app)
 
-# Connect to Kinesis
-kinesis = boto3.client('kinesis')
+load_dotenv()
 
-# Connect to IoT shadow
-shadow = boto3.client('iot-data')
+# Setup logging
+logging.basicConfig(filename='logs.log', level=logging.INFO, format='%(asctime)s:%(levelname)s:%(message)s')
 
-# Define the function to handle incoming data
-def iot_data_handler(payload):
-    # Extract the desired data from the payload
-    data = json.loads(payload)
-    temperature = data['temperature']
-    humidity = data['humidity']
+# Initialize sensor monitor
+sensor_monitor = SensorMonitor()
 
-    # Create a Kinesis record
-    kinesis_record = {
-        'Data': json.dumps(data),
-        'PartitionKey': 'partition_key'
-    }
+# Authentication and authorization
+def authenticate(username, password):
+    return verify_password(username, password)
 
-    # Put the record into Kinesis
-    kinesis.put_record(StreamName='my_stream', Record=kinesis_record)
+def identity(payload):
+    user_id = payload['identity']
+    return {'user_id': user_id}
 
-    # Update the shadow
-    shadow.update_thing_shadow(
-        thingName='my_thing',
-        payload=json.dumps({
-            'state': {
-                'reported': {
-                    'temperature': temperature,
-                    'humidity': humidity
-                }
-            }
-        })
-    )
+# Routes
+class SensorData(Resource):
+    @require_permission('read')
+    def get(self):
+        data = get_sensor_data()
+        return json.loads(data)
 
-# Subscribe to the IoT topic
-iot.subscribe(
-    topic='my_topic',
-    qos=1,
-    callback=iot_data_handler
-)
+    @require_permission('write')
+    def post(self):
+        data = request.json
+        data['timestamp'] = datetime.now().isoformat()
+        insert_sensor_data(data)
+        return {'message': 'Data saved'}
+
+api.add_resource(SensorData, '/api/sensor_data')
+
+if __name__ == '__main__':
+    app.run(debug=True, host=os.getenv('FLASK_APP_HOST'), port=os.getenv('FLASK_APP_PORT'))
