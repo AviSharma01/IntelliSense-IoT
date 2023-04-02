@@ -6,7 +6,7 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
 from database.queries import get_user_by_username
-from security import settings
+from backend import settings
 from schemas import TokenData, UserCreate, User
 
 
