@@ -4,7 +4,7 @@
 
 ### Detailed Description:
 
-IntelliSense is a robust IoT project with a variety of components that work together to provide a comprehensive solution. The backend component handles data processing and storage, while the machine learning component uses sklearn and pandas to provide valuable insights from the data. A database component is also included to ensure efficient data management and retrieval.
+IntelliSense is an IoT project with a variety of components that work together to provide a comprehensive solution. The backend component handles data processing and storage, while the machine learning component uses sklearn and pandas to provide valuable insights from the data. A database component is also included to ensure efficient data management and retrieval.
 
 The monitoring component is responsible for alerting users when certain conditions are met, and the security component provides authentication and authorization for secure access to the system.
 
