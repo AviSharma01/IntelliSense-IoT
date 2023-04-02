@@ -6,7 +6,7 @@ dbname = "intellisense_iot"
 user = "your-username"
 password = "your-password"
 host = "localhost"
-port = "your-port"
+port = 5432
 
 # Define connection function
 def connect():
