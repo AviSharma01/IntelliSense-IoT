@@ -16,6 +16,8 @@ jwt = JWTManager(app)
 # Initialize AWS IoT client object
 iot = boto3.client('iot')
 
+shadow = boto3.client('iot-data')
+
 # Define function to handle incoming data
 def iot_data_handler(payload):
     # Extract the desired data from the payload
@@ -49,16 +51,23 @@ iot.subscribe(
     callback=iot_data_handler
 )
 
-# Define route to get temperature data
 @app.route('/api/temperature')
 def get_temperature():
-    # TODO: Implement logic to get temperature data from the database
-    temperature_data = [{'timestamp': '2022-01-01T00:00:00Z', 'temperature': 20},
-                        {'timestamp': '2022-01-01T01:00:00Z', 'temperature': 21},
-                        {'timestamp': '2022-01-01T02:00:00Z', 'temperature': 22},
-                        {'timestamp': '2022-01-01T03:00:00Z', 'temperature': 23},
-                        {'timestamp': '2022-01-01T04:00:00Z', 'temperature': 24}]
-    return jsonify(temperature_data)
+    # Get temperature data from database
+    temperature_data = Temperature.query.all()
+
+    # Convert database objects to dictionary format
+    temperature_list = []
+    for temperature in temperature_data:
+        temperature_dict = {
+            'timestamp': temperature.timestamp,
+            'temperature': temperature.temperature
+        }
+        temperature_list.append(temperature_dict)
+
+    # Return temperature data as JSON
+    return jsonify(temperature_list)
+
 
 if __name__ == '__main__':
     app.run()
