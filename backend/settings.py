@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URI: str
     SQLALCHEMY_POOL_RECYCLE: int = 900
 
-    # AWS related settings
+    # AWS related settings (only for reference)
     AWS_ACCESS_KEY_ID: str = os.getenv('AWS_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY: str = os.getenv('AWS_SECRET_ACCESS_KEY')
     AWS_DEFAULT_REGION: str = os.getenv('AWS_DEFAULT_REGION')
