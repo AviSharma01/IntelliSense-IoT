@@ -11,7 +11,7 @@ joblib==1.2.0
 numpy==1.24.2
 pandas==1.5.3
 pi==0.1.2
-pipreqs==0.4.11
+pipreqs==0.4.12
 pyobjc==9.0
 pyobjc-core==9.0
 pyobjc-framework-Accessibility==9.0
